@@ -76,7 +76,7 @@ export default defineComponent({
     };
   },
   watch: {
-    searchValue: async function (newValue) {
+    searchValue: async function () {
       this.currentPage = 1;
       this.search();
     },
@@ -113,16 +113,16 @@ export default defineComponent({
     async search() {
       this.movies = await searchMovies(this.searchValue, this.currentPage);
       this.pagesIndexes = [];
+      const initialPageIndex =
+        this.currentPage + 10 <= this.movies.total_pages
+          ? this.currentPage
+          : this.movies.total_pages - 10;
       for (
-        var i =
-          this.currentPage + 10 <= this.movies.total_pages
-            ? this.currentPage
-            : this.movies.total_pages - 10;
+        let i = initialPageIndex;
         i <= this.movies.total_pages && i <= this.currentPage + 10;
         i++
       ) {
-        if (i <= 0) continue;
-
+        if (i <= 0 || i > this.movies.total_pages) continue;
         this.pagesIndexes.push(i);
       }
     },
