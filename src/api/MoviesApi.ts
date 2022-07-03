@@ -10,9 +10,7 @@ const get = async <TResponse>(uri: string) => {
 };
 
 export const listMovies = async (page: number) =>
-  {
-    return await get<MovieListPage>(`?page=${page}`);
-  };
+  await get<MovieListPage>(`?page=${page}`);
 
 export const searchMovies = async (movieTitle: string, page: number) =>
   await get<MovieListPage>(`/search?Title=${movieTitle}&page=${page}`);
