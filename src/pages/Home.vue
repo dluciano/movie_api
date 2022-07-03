@@ -16,9 +16,9 @@
         outline-none
       "
     />
+    <p>{{ movies.total }} movies found</p>
     <div class="grid grid-cols-4 gap-4">
-      <router-link
-        :to="{ name: 'Movie', params: { imdbId: movie.imdbID } }"
+      <div
         v-for="movie in movies.data"
         :key="movie.imdbID"
         class="
@@ -33,10 +33,13 @@
           dark:bg-gray-800 dark:border-gray-700 dark:hover:bg-gray-700
         "
       >
-        <div>{{ movie.Title }}</div>
-        <div>{{ movie.Year }}</div>
-        <div>{{ movie.imdbID }}</div>
-      </router-link>
+        <router-link :to="{ name: 'Movie', params: { imdbId: movie.imdbID } }">
+          <div>{{ movie.Title }}</div>
+          <div>{{ movie.Year }}</div>
+          <div>{{ movie.imdbID }}</div>
+        </router-link>
+        <div><input type="checkbox" /> Add to favorites</div>
+      </div>
     </div>
 
     <div class="flex justify-center items-center w-full">
@@ -111,21 +114,21 @@ export default defineComponent({
       await search();
       updatePagination();
     };
-    
+
     const goToFirstPage = async () => {
       currentPage.value = 1;
     };
-    
+
     const goToLastPage = async () => {
       currentPage.value = movies.value.total_pages;
     };
-    
+
     const goToPreviousPage = async () => {
       const nextPage = currentPage.value - 1;
       if (nextPage <= 0 || nextPage > movies.value.total_pages) return;
       currentPage.value = nextPage;
     };
-    
+
     const goToNextPage = async () => {
       const nextPage = currentPage.value + 1;
       if (nextPage <= 0 || nextPage > movies.value.total_pages) return;
