@@ -47,7 +47,7 @@ describe("movies api", () => {
     const movies = await searchMovies("", 4);
     expect(movies).toStrictEqual(expectedMovies);
   });
-  test("invalid page could retrieved empty results", async () => {
+  test("invalid page retrieve empty results", async () => {
     const expectedMovies: MovieListPage = {
       page: 5,
       per_page: 3,
@@ -58,7 +58,7 @@ describe("movies api", () => {
     const movies = await searchMovies("", 5);
     expect(movies).toStrictEqual(expectedMovies);
   });
-  test("when a valid movie is retrieved", async () => {
+  test("when search a movie and get the first page results", async () => {
     const expectedMovies: MovieListPage = {
       page: 1,
       per_page: 3,
