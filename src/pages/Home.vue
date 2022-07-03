@@ -1,8 +1,14 @@
 <template>
   <div class="my-3">
+    <input
+      type="search"
+      v-model="searchValue"
+      placeholder="To start search type the name of a movie..."
+      class="from-gray-700 mb-3 border border-black rounded w-full h-10 px-2 text-blue-400 outline-none"
+    />  
     <div class="grid grid-cols-4 gap-4">
       <router-link
-        :to="{ name: 'Movie', params: {imdbId: movie.imdbID} }"
+        :to="{ name: 'Movie', params: { imdbId: movie.imdbID } }"
         v-for="movie in movies.data"
         :key="movie.imdbID"
         class="
@@ -49,10 +55,12 @@ export default defineComponent({
       currentPage: 1,
       pagesIndexes: Array<number>(),
       movies: {},
+      searchValue: "",
     } as {
       currentPage: number;
       pagesIndexes: number[];
       movies: MovieListPage;
+      searchValue: string;
     };
   },
   computed: {
