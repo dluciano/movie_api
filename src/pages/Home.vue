@@ -41,7 +41,7 @@
 
     <div class="flex justify-center items-center w-full">
       <a v-on:click="goToFirstPage()" class="ml-1">&lt;&lt;</a>
-      <a v-on:click="previousPage()">&lt;</a>
+      <a v-on:click="goToPreviousPage()">&lt;</a>
       <div class="" v-for="index in pagesIndexes" :key="index">
         <a
           v-on:click="goToPage(index)"
@@ -50,82 +50,143 @@
           >{{ index }}</a
         >
       </div>
-      <a v-on:click="nextPage()" class="ml-1">&gt;</a>
+      <a v-on:click="goToNextPage()" class="ml-1">&gt;</a>
       <a v-on:click="goToLastPage()" class="ml-1">&gt;&gt;</a>
     </div>
   </div>
 </template>
 
 <script lang="ts">
-import { defineComponent } from "vue";
+import { defineComponent, ref, watch } from "vue";
 import type { MovieListPage } from "@/api/Models/MovieListPage";
 import { searchMovies } from "../api/MoviesApi";
+import { useRoute, useRouter } from "vue-router";
+
+const initialMoviePage: MovieListPage = {
+  data: [],
+  page: 1,
+  per_page: 0,
+  total: 0,
+  total_pages: 0,
+};
+
 export default defineComponent({
   name: "MovieList",
-  data() {
-    return {
-      currentPage: 1,
-      pagesIndexes: Array<number>(),
-      movies: {},
-      searchValue: "",
-    } as {
-      currentPage: number;
-      pagesIndexes: number[];
-      movies: MovieListPage;
-      searchValue: string;
-    };
-  },
-  watch: {
-    searchValue: async function () {
-      this.currentPage = 1;
-      this.search();
-    },
-  },
-  async mounted() {
-    this.search();
-  },
-  methods: {
-    async goToFirstPage() {
-      this.currentPage = 1;
-      await this.search();
-    },
-    async goToLastPage() {
-      this.currentPage = this.movies.total_pages;
-      await this.search();
-    },
-    async previousPage() {
-      const nextPage = this.currentPage - 1;
-      if (nextPage <= 0 || nextPage > this.movies.total_pages) return;
-      this.currentPage = nextPage;
-      await this.search();
-    },
-    async nextPage() {
-      const nextPage = this.currentPage + 1;
-      if (nextPage <= 0 || nextPage > this.movies.total_pages) return;
-      this.currentPage = nextPage;
-      await this.search();
-    },
-    async goToPage(pageIndex: number) {
-      if (pageIndex <= 0 || pageIndex > this.movies.total_pages) return;
-      this.currentPage = pageIndex;
-      await this.search();
-    },
-    async search() {
-      this.movies = await searchMovies(this.searchValue, this.currentPage);
-      this.pagesIndexes = [];
+  async setup() {
+    const route = useRoute();
+    const router = useRouter();
+
+    const { title, page } = route.query;
+
+    const currentPage = ref<number>(
+      page && parseInt(page.valueOf().toString()) > 1
+        ? parseInt(page.valueOf().toString())
+        : 1
+    );
+    const pagesIndexes = ref<number[]>([]);
+    const movies = ref<MovieListPage>(initialMoviePage);
+    const searchValue = ref(title ? title.valueOf().toString() : "");
+
+    const updatePagination = () => {
+      pagesIndexes.value = [];
       const initialPageIndex =
-        this.currentPage + 10 <= this.movies.total_pages
-          ? this.currentPage
-          : this.movies.total_pages - 10;
+        currentPage.value + 10 <= movies.value.total_pages
+          ? currentPage.value
+          : movies.value.total_pages - 10;
       for (
         let i = initialPageIndex;
-        i <= this.movies.total_pages && i <= this.currentPage + 10;
+        i <= movies.value.total_pages && i <= currentPage.value + 10;
         i++
       ) {
-        if (i <= 0 || i > this.movies.total_pages) continue;
-        this.pagesIndexes.push(i);
+        if (i <= 0 || i > movies.value.total_pages) continue;
+        pagesIndexes.value.push(i);
       }
-    },
+    };
+
+    const search = async () => {
+      movies.value = await searchMovies(searchValue.value, currentPage.value);
+    };
+
+    const loadPage = async () => {
+      await search();
+      updatePagination();
+    };
+    
+    const goToFirstPage = async () => {
+      currentPage.value = 1;
+    };
+    
+    const goToLastPage = async () => {
+      currentPage.value = movies.value.total_pages;
+    };
+    
+    const goToPreviousPage = async () => {
+      const nextPage = currentPage.value - 1;
+      if (nextPage <= 0 || nextPage > movies.value.total_pages) return;
+      currentPage.value = nextPage;
+    };
+    
+    const goToNextPage = async () => {
+      const nextPage = currentPage.value + 1;
+      if (nextPage <= 0 || nextPage > movies.value.total_pages) return;
+      currentPage.value = nextPage;
+    };
+
+    const goToPage = async (pageIndex: number) => {
+      if (pageIndex <= 0 || pageIndex > movies.value.total_pages) return;
+      currentPage.value = pageIndex;
+    };
+
+    const updateRouting = async () => {
+      let query = {};
+
+      if (searchValue.value) {
+        query = {
+          title: searchValue.value,
+        };
+      }
+
+      if (currentPage.value > 1) {
+        query = {
+          ...query,
+          page: currentPage.value,
+        };
+      }
+
+      await router.push({
+        path: "",
+        query,
+      });
+
+      await loadPage();
+    };
+
+    watch(
+      () => searchValue.value,
+      async () => {
+        currentPage.value = 1;
+        await updateRouting();
+      }
+    );
+    watch(() => currentPage.value, updateRouting);
+
+    await loadPage();
+
+    return {
+      // Data
+      currentPage,
+      pagesIndexes,
+      movies,
+      searchValue,
+
+      // Methods
+      goToFirstPage,
+      goToLastPage,
+      goToPreviousPage,
+      goToNextPage,
+      goToPage,
+      search,
+    };
   },
 });
 </script>

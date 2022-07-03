@@ -1,6 +1,5 @@
 import type { RouteRecordRaw } from "vue-router";
 import { createWebHistory, createRouter } from "vue-router";
-import Home from "@/pages/Home.vue";
 import Movie from "@/pages/Movie.vue";
 import Favorites from "@/pages/Favorites.vue";
 import NotFound from "@/pages/NotFound.vue";
@@ -9,7 +8,7 @@ const routes: RouteRecordRaw[] = [
   {
     path: "/",
     name: "Home",
-    component: Home,
+    component: () => import("@/pages/Home.vue"),
   },
   {
     path: "/movie/:imdbId",
