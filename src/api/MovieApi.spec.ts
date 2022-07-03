@@ -1,5 +1,5 @@
 import type { MovieListPage } from "./Models/MovieListPage";
-import { listMovies } from "./MoviesApi";
+import { searchMovies } from "./MoviesApi";
 import { server } from "./mocks/server";
 
 describe("movies api", () => {
@@ -18,7 +18,7 @@ describe("movies api", () => {
         { Title: "Title3", imdbID: "3", Year: 2003 },
       ],
     };
-    const movies = await listMovies(1);
+    const movies = await searchMovies("", 1);
     expect(movies).toStrictEqual(expectedMovies);
   });
   test("second page of the list of movies is retrieved successfully", async () => {
@@ -33,7 +33,7 @@ describe("movies api", () => {
         { Title: "Title6", imdbID: "6", Year: 2006 },
       ],
     };
-    const movies = await listMovies(2);
+    const movies = await searchMovies("", 2);
     expect(movies).toStrictEqual(expectedMovies);
   });
   test("last page of the list of movies is retrieved successfully", async () => {
@@ -44,7 +44,7 @@ describe("movies api", () => {
       total_pages: 4,
       data: [{ Title: "Title13", imdbID: "13", Year: 2013 }],
     };
-    const movies = await listMovies(4);
+    const movies = await searchMovies("", 4);
     expect(movies).toStrictEqual(expectedMovies);
   });
   test("invalid page could retrieved empty results", async () => {
@@ -55,7 +55,22 @@ describe("movies api", () => {
       total_pages: 4,
       data: [],
     };
-    const movies = await listMovies(5);
+    const movies = await searchMovies("", 5);
+    expect(movies).toStrictEqual(expectedMovies);
+  });
+  test("when a valid movie is retrieved", async () => {
+    const expectedMovies: MovieListPage = {
+      page: 1,
+      per_page: 3,
+      total: 7,
+      total_pages: 2,
+      data: [
+        { Title: "Existing1", imdbID: "1", Year: 2001 },
+        { Title: "Existing2", imdbID: "2", Year: 2002 },
+        { Title: "Existing3", imdbID: "3", Year: 2003 },
+      ],
+    };
+    const movies = await searchMovies("existingMovie", 1);
     expect(movies).toStrictEqual(expectedMovies);
   });
 });

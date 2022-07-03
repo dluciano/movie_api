@@ -1,11 +1,5 @@
 import { rest } from "msw";
 
-const searchMoviesEndpoint = rest.get(
-  `${process.env.VUE_APP_MOVIES_API}/movies/search`,
-  (_, res, ctx) => {
-    return res(ctx.status(500), ctx.json({}));
-  }
-);
 const firstPageOfMovies = {
   page: 1,
   per_page: 3,
@@ -45,16 +39,52 @@ const invalidPageOfMovies = {
   data: [],
 };
 
+const firstPageWithSearchValue = {
+  page: 1,
+  per_page: 3,
+  total: 7,
+  total_pages: 2,
+  data: [
+    { Title: "Existing1", imdbID: "1", Year: 2001 },
+    { Title: "Existing2", imdbID: "2", Year: 2002 },
+    { Title: "Existing3", imdbID: "3", Year: 2003 },
+  ],
+};
+
+const searchValueNotFound = {
+  page: 1,
+  per_page: 3,
+  total: 0,
+  total_pages: 0,
+  data: [],
+};
+
 const moviesEndpoint = rest.get(
-  `${process.env.VUE_APP_MOVIES_API}/movies`,
+  `${process.env.VUE_APP_MOVIES_API}/movies/search`,
   (req, res, ctx) => {
     const pageParam = req.url.searchParams.get("page");
+    const searchParam = req.url.searchParams.get("Title");
     let page = firstPageOfMovies;
-    if (pageParam && pageParam === "2") page = secondPageOfMovies;
+    if (
+      pageParam &&
+      pageParam === "1" &&
+      searchParam &&
+      searchParam === "existingMovie"
+    )
+      page = firstPageWithSearchValue;
+    else if (
+      pageParam &&
+      pageParam === "1" &&
+      searchParam &&
+      searchParam === "noExistingMovie"
+    )
+      page = searchValueNotFound;
+    else if (pageParam && pageParam === "2") page = secondPageOfMovies;
     else if (pageParam && pageParam === "4") page = lastPageOfMovies;
     else if (pageParam && pageParam === "5") page = invalidPageOfMovies;
+
     return res(ctx.status(200), ctx.json(page));
   }
 );
 
-export const handlers = [moviesEndpoint, searchMoviesEndpoint];
+export const handlers = [moviesEndpoint];

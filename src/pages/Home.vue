@@ -4,8 +4,18 @@
       type="search"
       v-model="searchValue"
       placeholder="To start search type the name of a movie..."
-      class="from-gray-700 mb-3 border border-black rounded w-full h-10 px-2 text-blue-400 outline-none"
-    />  
+      class="
+        from-gray-700
+        mb-3
+        border border-black
+        rounded
+        w-full
+        h-10
+        px-2
+        text-blue-400
+        outline-none
+      "
+    />
     <div class="grid grid-cols-4 gap-4">
       <router-link
         :to="{ name: 'Movie', params: { imdbId: movie.imdbID } }"
@@ -30,13 +40,18 @@
     </div>
 
     <div class="flex justify-center items-center w-full">
-      <a v-on:click="goToPage(1)" class="ml-1">&lt;&lt;</a>
-      <a v-on:click="goToPage(currentPage - 1)">&lt;</a>
+      <a v-on:click="goToFirstPage()" class="ml-1">&lt;&lt;</a>
+      <a v-on:click="previousPage()">&lt;</a>
       <div class="" v-for="index in pagesIndexes" :key="index">
-        <a v-on:click="goToPage(index)" class="ml-1">{{ index }}</a>
+        <a
+          v-on:click="goToPage(index)"
+          class="ml-1"
+          :class="[currentPage === index ? 'underline' : '']"
+          >{{ index }}</a
+        >
       </div>
-      <a v-on:click="goToPage(currentPage + 1)" class="ml-1">&gt;</a>
-      <a v-on:click="goToPage(movies.total_pages)" class="ml-1">&gt;&gt;</a>
+      <a v-on:click="nextPage()" class="ml-1">&gt;</a>
+      <a v-on:click="goToLastPage()" class="ml-1">&gt;&gt;</a>
     </div>
   </div>
 </template>
@@ -44,12 +59,9 @@
 <script lang="ts">
 import { defineComponent } from "vue";
 import type { MovieListPage } from "@/api/Models/MovieListPage";
-import { listMovies } from "../api/MoviesApi";
+import { searchMovies } from "../api/MoviesApi";
 export default defineComponent({
   name: "MovieList",
-  async mounted() {
-    this.goToPage(1);
-  },
   data() {
     return {
       currentPage: 1,
@@ -63,25 +75,54 @@ export default defineComponent({
       searchValue: string;
     };
   },
-  computed: {
-    isFirstPage() {
-      this.currentPage === 1;
+  watch: {
+    searchValue: async function (newValue) {
+      this.currentPage = 1;
+      this.search();
     },
   },
+  async mounted() {
+    this.search();
+  },
   methods: {
+    async goToFirstPage() {
+      this.currentPage = 1;
+      await this.search();
+    },
+    async goToLastPage() {
+      this.currentPage = this.movies.total_pages;
+      await this.search();
+    },
+    async previousPage() {
+      const nextPage = this.currentPage - 1;
+      if (nextPage <= 0 || nextPage > this.movies.total_pages) return;
+      this.currentPage = nextPage;
+      await this.search();
+    },
+    async nextPage() {
+      const nextPage = this.currentPage + 1;
+      if (nextPage <= 0 || nextPage > this.movies.total_pages) return;
+      this.currentPage = nextPage;
+      await this.search();
+    },
     async goToPage(pageIndex: number) {
-      if (pageIndex === 0 || pageIndex === this.movies.total_pages + 1) return;
+      if (pageIndex <= 0 || pageIndex > this.movies.total_pages) return;
       this.currentPage = pageIndex;
-      this.movies = await listMovies(pageIndex);
+      await this.search();
+    },
+    async search() {
+      this.movies = await searchMovies(this.searchValue, this.currentPage);
       this.pagesIndexes = [];
       for (
         var i =
           this.currentPage + 10 <= this.movies.total_pages
             ? this.currentPage
             : this.movies.total_pages - 10;
-        i < this.movies.total_pages && i < this.currentPage + 10;
+        i <= this.movies.total_pages && i <= this.currentPage + 10;
         i++
       ) {
+        if (i <= 0) continue;
+
         this.pagesIndexes.push(i);
       }
     },
