@@ -1,7 +1,7 @@
 import axios from "axios";
 import type { MovieListPage } from "./Models/MovieListPage";
 
-const apiUrl = process.env.VUE_APP_MOVIES_API;
+const apiUrl = "https://jsonmock.hackerrank.com/api";
 
 const get = async <TResponse>(uri: string) => {
   const url = `${apiUrl}/movies${uri}`;
