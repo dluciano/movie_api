@@ -1,9 +1,9 @@
-<script setup lang="ts">
-import MovieListVue from "./components/MovieList.vue";
-</script>
-
 <template>
   <div class="container mx-auto">
-    <MovieListVue />
+    <div id="nav">
+      <router-link to="/">Home</router-link> |
+      <router-link to="/fav">Favorites</router-link>
+    </div>
+    <router-view />
   </div>
 </template>

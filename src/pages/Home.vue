@@ -1,7 +1,8 @@
 <template>
   <div class="my-3">
     <div class="grid grid-cols-4 gap-4">
-      <a
+      <router-link
+        :to="{ name: 'Movie', params: {imdbId: movie.imdbID} }"
         v-for="movie in movies.data"
         :key="movie.imdbID"
         class="
@@ -19,7 +20,7 @@
         <div>{{ movie.Title }}</div>
         <div>{{ movie.Year }}</div>
         <div>{{ movie.imdbID }}</div>
-      </a>
+      </router-link>
     </div>
 
     <div class="flex justify-center items-center w-full">
