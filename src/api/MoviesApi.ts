@@ -1,8 +1,7 @@
 import axios from "axios";
 import type { MovieListPage } from "./Models/MovieListPage";
 
-// TODO: use env
-const apiUrl = "https://jsonplaceholder.typicode.com";
+const apiUrl = process.env.VUE_APP_MOVIES_API;
 
 const get = async <TResponse>(uri: string) => {
   const url = `${apiUrl}/movies${uri}`;
@@ -11,7 +10,9 @@ const get = async <TResponse>(uri: string) => {
 };
 
 export const listMovies = async (page: number) =>
-  await get<MovieListPage>(`?page=${page}`);
+  {
+    return await get<MovieListPage>(`?page=${page}`);
+  };
 
 export const searchMovies = async (movieTitle: string, page: number) =>
   await get<MovieListPage>(`/search?Title=${movieTitle}&page=${page}`);
