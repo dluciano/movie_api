@@ -1,7 +1,7 @@
 <template>
-  <div>
-    <p v-if="store.favMovies.length === 0">No favorites added yet!</p>
-    <div v-for="movie in store.favMovies" :key="movie.imdbID">
+  <p v-if="store.favMovies.length === 0">No favorites added yet!</p>
+  <div class="grid grid-cols-4">
+    <div class="p-3" v-for="movie in store.favMovies" :key="movie.imdbID">
       <MoviePanel
         :title="movie.Title"
         :imdbID="movie.imdbID"

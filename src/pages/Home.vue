@@ -18,8 +18,8 @@
     />
     <p v-if="movies.data.length > 0">{{ movies.total }} movies found</p>
     <p v-if="movies.data.length === 0">{{ movies.total }} No movies found</p>
-    <div class="grid grid-cols-4 gap-4">
-      <div v-for="movie in movies.data" :key="movie.imdbID">
+    <div class="grid grid-cols-4" >
+      <div v-for="movie in movies.data" :key="movie.imdbID" class="p-3">
         <MoviePanel
           :title="movie.Title"
           :imdbID="movie.imdbID"

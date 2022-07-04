@@ -2,8 +2,9 @@
   <div
     class="
       inline-block
-      p-6
-      max-w-sm
+      p-3
+      w-full
+      h-full
       bg-white
       rounded-lg
       border border-gray-200
@@ -12,12 +13,12 @@
       dark:bg-gray-800 dark:border-gray-700 dark:hover:bg-gray-700
     "
   >
-    <div>
-      <div>{{ title }}</div>
-      <div>{{ year }}</div>
-      <div>{{ imdbID }}</div>
-    </div>
-    <div>
+    <article>
+      <h1 class="font-black inline-block">{{ title }}</h1>
+      <p class="inline-block float-right">#{{ imdbID }}</p>
+      <p class="">{{ year }}</p>
+    </article>
+    <div class="float-right">
       <input
         type="checkbox"
         @change="(e) => onFavMovieChanged(e, { title, year, imdbID })"
