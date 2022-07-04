@@ -41,7 +41,7 @@
         <div>
           <input
             type="checkbox"
-            @change="favChanged(movie)"
+            @change="(e) => favChanged(e, movie)"
             :checked="isFav(movie.imdbID)"
           />
           Add to favorites
@@ -57,8 +57,8 @@
           v-on:click="goToPage(index)"
           class="ml-1"
           :class="[currentPage === index ? 'underline' : '']"
-          >{{ index }}</a
-        >
+          >{{ index }}
+        </a>
       </div>
       <a v-on:click="goToNextPage()" class="ml-1">&gt;</a>
       <a v-on:click="goToLastPage()" class="ml-1">&gt;&gt;</a>
@@ -109,7 +109,7 @@ export default defineComponent({
     };
 
     const isFav = (imdbID: string) => initialFavMovieImdbIDs.has(imdbID);
-    
+
     const updatePagination = () => {
       pagesIndexes.value = [];
       const initialPageIndex =
@@ -185,8 +185,9 @@ export default defineComponent({
       await loadPage();
     };
 
-    const favChanged = (movie: Movie) => {
-      addFavMovieAsync(movie);
+    const favChanged = (e: Event, movie: Movie) => {
+      const { checked } = e.target as HTMLInputElement;
+      if (checked) addFavMovieAsync(movie);
     };
 
     watch(
