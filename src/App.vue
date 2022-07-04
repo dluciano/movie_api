@@ -21,3 +21,17 @@
   </div>
 </template>
 
+<script lang="ts">
+import { defineComponent } from "vue";
+import { useMovieStore } from "@/store";
+import { favMoviesRepo } from "@/db";
+
+export default defineComponent({
+  setup() {
+    const store = useMovieStore();
+    store.$subscribe(async (_, state) => {
+      await favMoviesRepo.sync(state.favMovies);
+    });
+  },
+});
+</script>
