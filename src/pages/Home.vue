@@ -18,34 +18,12 @@
     />
     <p>{{ movies.total }} movies found</p>
     <div class="grid grid-cols-4 gap-4">
-      <div
-        v-for="movie in movies.data"
-        :key="movie.imdbID"
-        class="
-          inline-block
-          p-6
-          max-w-sm
-          bg-white
-          rounded-lg
-          border border-gray-200
-          shadow-md
-          hover:bg-gray-100
-          dark:bg-gray-800 dark:border-gray-700 dark:hover:bg-gray-700
-        "
-      >
+      <div v-for="movie in movies.data" :key="movie.imdbID">
         <MoviePanel
           :title="movie.Title"
           :imdbID="movie.imdbID"
           :year="movie.Year"
         />
-        <div>
-          <input
-            type="checkbox"
-            @change="(e) => favChanged(e, movie)"
-            :checked="isFav(movie.imdbID)"
-          />
-          Add to favorites
-        </div>
       </div>
     </div>
     <div class="flex justify-center items-center w-full">
@@ -70,7 +48,6 @@ import { defineComponent, ref, watch } from "vue";
 import type { MovieListPage } from "@/api/Models/MovieListPage";
 import { searchMovies } from "../api/MoviesApi";
 import { useRoute, useRouter } from "vue-router";
-import type { Movie } from "@/api";
 import { useMovieStore } from "@/store";
 import MoviePanel from "@/components/MoviePanel.vue";
 
@@ -84,15 +61,16 @@ const initialMoviePage: MovieListPage = {
 
 export default defineComponent({
   name: "MovieList",
-  components:{
-    MoviePanel
+  components: {
+    MoviePanel,
   },
   async setup() {
     const route = useRoute();
     const router = useRouter();
     const store = useMovieStore();
-    const { addFavMovieAsync, loadFavMoviesAsync, removeFavMovieAsync } = store;
+    const { loadFavMoviesAsync } = store;
     const { title, page } = route.query;
+
     const currentPage = ref<number>(
       page && parseInt(page.valueOf().toString()) > 1
         ? parseInt(page.valueOf().toString())
@@ -102,12 +80,13 @@ export default defineComponent({
     const movies = ref<MovieListPage>(initialMoviePage);
     const searchValue = ref(title ? title.valueOf().toString() : "");
     const initialFavMovieImdbIDs = new Set<string>();
+
     const syncFavMovies = async () => {
       await loadFavMoviesAsync();
       initialFavMovieImdbIDs.clear();
       for (const m of store.favMovies) initialFavMovieImdbIDs.add(m.imdbID);
     };
-    const isFav = (imdbID: string) => initialFavMovieImdbIDs.has(imdbID);
+
     const updatePagination = () => {
       pagesIndexes.value = [];
       const initialPageIndex =
@@ -123,14 +102,38 @@ export default defineComponent({
         pagesIndexes.value.push(i);
       }
     };
+    
     const search = async () => {
       movies.value = await searchMovies(searchValue.value, currentPage.value);
     };
+    
     const loadPage = async () => {
       await search();
       await syncFavMovies();
       updatePagination();
     };
+
+    const updateRouting = async () => {
+      let query = {};
+      if (searchValue.value) {
+        query = {
+          title: searchValue.value,
+        };
+      }
+      if (currentPage.value > 1) {
+        query = {
+          ...query,
+          page: currentPage.value,
+        };
+      }
+      await router.push({
+        path: "",
+        query,
+      });
+      await loadPage();
+    };
+
+    // Methods
     const goToFirstPage = async () => {
       currentPage.value = 1;
     };
@@ -151,33 +154,8 @@ export default defineComponent({
       if (pageIndex <= 0 || pageIndex > movies.value.total_pages) return;
       currentPage.value = pageIndex;
     };
-    const updateRouting = async () => {
-      let query = {};
-      if (searchValue.value) {
-        query = {
-          title: searchValue.value,
-        };
-      }
-      if (currentPage.value > 1) {
-        query = {
-          ...query,
-          page: currentPage.value,
-        };
-      }
-      await router.push({
-        path: "",
-        query,
-      });
-      await loadPage();
-    };
-    const favChanged = (e: Event, movie: Movie) => {
-      const { checked } = e.target as HTMLInputElement;
-      if (checked) {
-        addFavMovieAsync(movie);
-        return;
-      }
-      removeFavMovieAsync(movie);
-    };
+
+    // Watch
     watch(
       () => searchValue.value,
       async () => {
@@ -186,7 +164,9 @@ export default defineComponent({
       }
     );
     watch(() => currentPage.value, updateRouting);
+
     await loadPage();
+
     return {
       // Data
       currentPage,
@@ -200,8 +180,6 @@ export default defineComponent({
       goToNextPage,
       goToPage,
       search,
-      favChanged,
-      isFav,
     };
   },
 });

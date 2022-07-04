@@ -20,9 +20,9 @@ export const useMovieStore = defineStore("main", {
       if (this.favMovies.find((m) => m.imdbID === movie.imdbID)) return;
       this.favMovies = [...this.favMovies, movie];
     },
-    async removeFavMovieAsync(movie: Movie) {
+    async removeFavMovieAsync(imdbID: string) {
       this.favMovies = [
-        ...this.favMovies.filter((m) => m.imdbID !== movie.imdbID),
+        ...this.favMovies.filter((m) => m.imdbID !== imdbID),
       ];
     },
   },
