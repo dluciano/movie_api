@@ -42,8 +42,7 @@ export default defineComponent({
     isChecked: Boolean,
   },
   setup() {
-    const store = useMovieStore();
-    const { addFavMovieAsync, removeFavMovieAsync } = store;    
+    const { addFavMovieAsync, removeFavMovieAsync } = useMovieStore();
 
     const onFavMovieChanged = (
       e: Event,
