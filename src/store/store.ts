@@ -17,6 +17,7 @@ export const useMovieStore = defineStore("main", {
       this.favMovies = await favMoviesRepo.getAll();
     },
     async addFavMovieAsync(movie: Movie) {
+      if (this.favMovies.find((m) => m.imdbID === movie.imdbID)) return;
       this.favMovies = [...this.favMovies, movie];
     },
     async removeFavMovieAsync(movie: Movie) {
