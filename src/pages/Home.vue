@@ -88,7 +88,7 @@ export default defineComponent({
     const route = useRoute();
     const router = useRouter();
     const store = useMovieStore();
-    const { addFavMovieAsync, loadFavMoviesAsync } = store;
+    const { addFavMovieAsync, loadFavMoviesAsync, removeFavMovieAsync } = store;
 
     const { title, page } = route.query;
 
@@ -187,7 +187,11 @@ export default defineComponent({
 
     const favChanged = (e: Event, movie: Movie) => {
       const { checked } = e.target as HTMLInputElement;
-      if (checked) addFavMovieAsync(movie);
+      if (checked) {
+        addFavMovieAsync(movie);
+        return;
+      }
+      removeFavMovieAsync(movie);
     };
 
     watch(
