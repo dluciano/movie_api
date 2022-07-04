@@ -1,6 +1,26 @@
-# MovieApiProject
+# IMDB Movies Searcher
 
-This template should help get you started developing with Vue 3 in Vite.
+Simple site to search IMDB movies and save it as favorite in your browser.
+
+## Tech stack
+ - TypeScript
+ - Vue 3 (Composition API)
+ - Vue Router
+ - Vite
+ - Axios
+ - Pinia
+ - Tailwind
+ - Jest and MWS
+
+ ## TODO's
+ - [ ] The movies grid found in the Home page could be a shared component and used in the favorites page
+ - [ ] Unit test store and repo
+ - [ ] UI Test
+ - [ ] E2E Test
+ - [ ] Style/Design web site. Current design is minimalist
+ - [ ] Animations
+
+*List is prioritized
 
 ## Recommended IDE Setup
 
