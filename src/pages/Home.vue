@@ -39,7 +39,12 @@
           <div>{{ movie.imdbID }}</div>
         </router-link>
         <div>
-          <input type="checkbox" @change="favChanged(movie)" /> Add to favorites
+          <input
+            type="checkbox"
+            @change="favChanged(movie)"
+            :checked="isFav(movie.imdbID)"
+          />
+          Add to favorites
         </div>
       </div>
     </div>
@@ -82,7 +87,8 @@ export default defineComponent({
   async setup() {
     const route = useRoute();
     const router = useRouter();
-    const { addFavMovieAsync, loadFavMoviesAsync } = useMovieStore();
+    const store = useMovieStore();
+    const { addFavMovieAsync, loadFavMoviesAsync } = store;
 
     const { title, page } = route.query;
 
@@ -94,7 +100,16 @@ export default defineComponent({
     const pagesIndexes = ref<number[]>([]);
     const movies = ref<MovieListPage>(initialMoviePage);
     const searchValue = ref(title ? title.valueOf().toString() : "");
+    const initialFavMovieImdbIDs = new Set<string>();
 
+    const syncFavMovies = async () => {
+      await loadFavMoviesAsync();
+      initialFavMovieImdbIDs.clear();
+      for (const m of store.favMovies) initialFavMovieImdbIDs.add(m.imdbID);
+    };
+
+    const isFav = (imdbID: string) => initialFavMovieImdbIDs.has(imdbID);
+    
     const updatePagination = () => {
       pagesIndexes.value = [];
       const initialPageIndex =
@@ -117,6 +132,7 @@ export default defineComponent({
 
     const loadPage = async () => {
       await search();
+      await syncFavMovies();
       updatePagination();
     };
 
@@ -199,6 +215,7 @@ export default defineComponent({
       goToPage,
       search,
       favChanged,
+      isFav,
     };
   },
 });
