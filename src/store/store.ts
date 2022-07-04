@@ -13,10 +13,10 @@ const initialState: RootState = {
 export const useMovieStore = defineStore("main", {
   state: () => initialState,
   actions: {
-    async loadMoviesAsync() {
+    async loadFavMoviesAsync() {
       this.favMovies = await favMoviesRepo.getAll();
     },
-    async addMovieAsync(movie: Movie) {
+    async addFavMovieAsync(movie: Movie) {
       this.favMovies = [...this.favMovies, movie];
     },
   },

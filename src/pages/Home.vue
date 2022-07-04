@@ -82,7 +82,7 @@ export default defineComponent({
   async setup() {
     const route = useRoute();
     const router = useRouter();
-    const { addMovieAsync } = useMovieStore();
+    const { addFavMovieAsync, loadFavMoviesAsync } = useMovieStore();
 
     const { title, page } = route.query;
 
@@ -170,7 +170,7 @@ export default defineComponent({
     };
 
     const favChanged = (movie: Movie) => {
-      addMovieAsync(movie);
+      addFavMovieAsync(movie);
     };
 
     watch(

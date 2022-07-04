@@ -13,7 +13,7 @@ import { defineComponent } from "vue";
 export default defineComponent({
   async setup() {
     const store  = useMovieStore();
-    await store.loadMoviesAsync();
+    await store.loadFavMoviesAsync();
     return {
       store,
     };
