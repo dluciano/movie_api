@@ -1,5 +1,7 @@
 import { rest } from "msw";
 
+//TODO: retrieve value from env; for instance process.env.VUE_APP_MOVIES_API
+const apiUrl = "https://jsonmock.hackerrank.com/api";
 const firstPageOfMovies = {
   page: 1,
   per_page: 3,
@@ -60,7 +62,8 @@ const searchValueNotFound = {
 };
 
 const moviesEndpoint = rest.get(
-  `${process.env.VUE_APP_MOVIES_API}/movies/search`,
+  // TODO: use ${process.env.VUE_APP_MOVIES_API}
+  `${apiUrl}/movies/search`,
   (req, res, ctx) => {
     const pageParam = req.url.searchParams.get("page");
     const searchParam = req.url.searchParams.get("Title");
