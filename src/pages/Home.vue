@@ -33,11 +33,11 @@
           dark:bg-gray-800 dark:border-gray-700 dark:hover:bg-gray-700
         "
       >
-        <router-link :to="{ name: 'Movie', params: { imdbId: movie.imdbID } }">
+        <div>
           <div>{{ movie.Title }}</div>
           <div>{{ movie.Year }}</div>
           <div>{{ movie.imdbID }}</div>
-        </router-link>
+        </div>
         <div>
           <input
             type="checkbox"
