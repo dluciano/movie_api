@@ -89,15 +89,15 @@ export default defineComponent({
       for (const m of store.favMovies) initialFavMovieImdbIDs.add(m.imdbID);
     };
 
-    const updatePagination = () => {
+    const updatePagination = (itemsPerPage: number = 10) => {
       pagesIndexes.value = [];
       const initialPageIndex =
-        currentPage.value + 10 <= movies.value.total_pages
+        currentPage.value + itemsPerPage <= movies.value.total_pages
           ? currentPage.value
-          : movies.value.total_pages - 10;
+          : movies.value.total_pages - itemsPerPage;
       for (
         let i = initialPageIndex;
-        i <= movies.value.total_pages && i <= currentPage.value + 10;
+        i <= movies.value.total_pages && i <= currentPage.value + itemsPerPage;
         i++
       ) {
         if (i <= 0 || i > movies.value.total_pages) continue;
