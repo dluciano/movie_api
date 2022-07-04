@@ -21,7 +21,7 @@
       <input
         type="checkbox"
         @change="(e) => onFavMovieChanged(e, { title, year, imdbID })"
-        :checked="() => isFav(imdbID)"
+        :checked="isChecked"
       />
       Add to favorites
     </div>
@@ -39,11 +39,11 @@ export default defineComponent({
     title: String,
     year: Number,
     imdbID: String,
+    isChecked: Boolean,
   },
   setup() {
     const store = useMovieStore();
-    const { addFavMovieAsync, removeFavMovieAsync } = store;
-    const favMovieImdbIDsSet = new Set<string>();
+    const { addFavMovieAsync, removeFavMovieAsync } = store;    
 
     const onFavMovieChanged = (
       e: Event,
@@ -67,13 +67,8 @@ export default defineComponent({
       removeFavMovieAsync(movie.imdbID);
     };
 
-    const isFav = (imdbID?: string) => {
-      if (!imdbID) return false;
-      return favMovieImdbIDsSet.has(imdbID);
-    };
     return {
       onFavMovieChanged,
-      isFav,
     };
   },
 });

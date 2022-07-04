@@ -16,13 +16,15 @@
         outline-none
       "
     />
-    <p>{{ movies.total }} movies found</p>
+    <p v-if="movies.data.length > 0">{{ movies.total }} movies found</p>
+    <p v-if="movies.data.length === 0">{{ movies.total }} No movies found</p>
     <div class="grid grid-cols-4 gap-4">
       <div v-for="movie in movies.data" :key="movie.imdbID">
         <MoviePanel
           :title="movie.Title"
           :imdbID="movie.imdbID"
           :year="movie.Year"
+          :isChecked="isFav(movie.imdbID)"
         />
       </div>
     </div>
@@ -102,11 +104,11 @@ export default defineComponent({
         pagesIndexes.value.push(i);
       }
     };
-    
+
     const search = async () => {
       movies.value = await searchMovies(searchValue.value, currentPage.value);
     };
-    
+
     const loadPage = async () => {
       await search();
       await syncFavMovies();
@@ -154,6 +156,7 @@ export default defineComponent({
       if (pageIndex <= 0 || pageIndex > movies.value.total_pages) return;
       currentPage.value = pageIndex;
     };
+    const isFav = (imdbID: string) => initialFavMovieImdbIDs.has(imdbID);
 
     // Watch
     watch(
@@ -165,6 +168,7 @@ export default defineComponent({
     );
     watch(() => currentPage.value, updateRouting);
 
+    // Before create
     await loadPage();
 
     return {
@@ -180,6 +184,7 @@ export default defineComponent({
       goToNextPage,
       goToPage,
       search,
+      isFav,
     };
   },
 });

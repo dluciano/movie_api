@@ -1,11 +1,12 @@
 <template>
   <div>
-    <h1>Favorites</h1>
+    <p v-if="store.favMovies.length === 0">No favorites added yet!</p>
     <div v-for="movie in store.favMovies" :key="movie.imdbID">
       <MoviePanel
         :title="movie.Title"
         :imdbID="movie.imdbID"
         :year="movie.Year"
+        :isChecked="true"
       />
     </div>
   </div>
@@ -15,8 +16,8 @@ import { useMovieStore } from "@/store";
 import { defineComponent } from "vue";
 import MoviePanel from "@/components/MoviePanel.vue";
 export default defineComponent({
-  components:{
-    MoviePanel
+  components: {
+    MoviePanel,
   },
   async setup() {
     const store = useMovieStore();
