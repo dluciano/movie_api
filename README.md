@@ -19,6 +19,7 @@ Simple site to search IMDB movies and save it as favorite in your browser.
  - [ ] E2E Test
  - [ ] Style/Design web site. Current design is minimalist
  - [ ] Animations
+ - [ ] Enforce standards by using tools like eslint, conventional commits, etc
 
 *List is prioritized
 
