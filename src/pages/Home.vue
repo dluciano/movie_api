@@ -38,7 +38,9 @@
           <div>{{ movie.Year }}</div>
           <div>{{ movie.imdbID }}</div>
         </router-link>
-        <div><input type="checkbox" /> Add to favorites</div>
+        <div>
+          <input type="checkbox" @change="favChanged(movie)" /> Add to favorites
+        </div>
       </div>
     </div>
 
@@ -64,6 +66,8 @@ import { defineComponent, ref, watch } from "vue";
 import type { MovieListPage } from "@/api/Models/MovieListPage";
 import { searchMovies } from "../api/MoviesApi";
 import { useRoute, useRouter } from "vue-router";
+import type { Movie } from "@/api";
+import { useMovieStore } from "@/store";
 
 const initialMoviePage: MovieListPage = {
   data: [],
@@ -78,6 +82,7 @@ export default defineComponent({
   async setup() {
     const route = useRoute();
     const router = useRouter();
+    const { addMovieAsync } = useMovieStore();
 
     const { title, page } = route.query;
 
@@ -164,6 +169,10 @@ export default defineComponent({
       await loadPage();
     };
 
+    const favChanged = (movie: Movie) => {
+      addMovieAsync(movie);
+    };
+
     watch(
       () => searchValue.value,
       async () => {
@@ -189,6 +198,7 @@ export default defineComponent({
       goToNextPage,
       goToPage,
       search,
+      favChanged,
     };
   },
 });

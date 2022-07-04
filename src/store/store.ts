@@ -16,5 +16,8 @@ export const useMovieStore = defineStore("main", {
     async loadMoviesAsync() {
       this.favMovies = await favMoviesRepo.getAll();
     },
+    async addMovieAsync(movie: Movie) {
+      this.favMovies = [...this.favMovies, movie];
+    },
   },
 });
