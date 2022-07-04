@@ -14,12 +14,13 @@ Simple site to search IMDB movies and save it as favorite in your browser.
 
  ## TODO's
  - [ ] The movies grid found in the Home page could be a shared component and used in the favorites page
- - [ ] Unit test store and repo
+ - [ ] Unit test the store and the repo
  - [ ] UI Test
  - [ ] E2E Test
+ - [ ] Enforce standards by using tools like eslint, conventional commits, broweserlist, etc
  - [ ] Style/Design web site. Current design is minimalist
+ - [ ] Made site responsive
  - [ ] Animations
- - [ ] Enforce standards by using tools like eslint, conventional commits, etc
 
 *List is prioritized
 
