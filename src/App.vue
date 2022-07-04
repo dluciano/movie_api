@@ -1,8 +1,28 @@
 <template>
   <div class="container mx-auto">
     <div id="nav">
-      <router-link to="/">Home</router-link> |
-      <router-link to="/fav">Favorites</router-link>
+      <router-link to="/" v-slot="{ isActive, isExactActive }">
+        <p
+        class="inline-block mr-3"
+          :class="[
+            isActive && 'underline',
+            isExactActive && 'underline',
+          ]"
+        >
+          Home
+        </p>
+      </router-link>
+      
+      <router-link to="/fav" v-slot="{ isActive, isExactActive }">
+        <p
+        class="inline-block"
+          :class="[
+            isActive && 'underline',
+            isExactActive && 'underline',
+          ]"
+        >
+          Favorites
+        </p></router-link>
     </div>
     <router-view v-slot="{ Component, route }">
       <suspense>

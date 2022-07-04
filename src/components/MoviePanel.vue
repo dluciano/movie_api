@@ -14,9 +14,9 @@
     "
   >
     <article>
-      <h1 class="font-black inline-block">{{ title }}</h1>
+      <h1 class="font-black inline-block w-64">{{ title }}</h1>
       <p class="inline-block float-right">#{{ imdbID }}</p>
-      <p class="">{{ year }}</p>
+      <p>{{ year }}</p>
     </article>
     <div class="float-right">
       <input
