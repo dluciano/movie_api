@@ -3,10 +3,11 @@
     <input
       type="search"
       v-model="searchValue"
-      placeholder="To start search type the name of a movie..."
+      placeholder="Type the name of a movie to start searching..."
       class="
         from-gray-700
         mb-3
+        max-w-sm
         border border-black
         rounded
         w-full
@@ -18,7 +19,7 @@
     />
     <p v-if="movies.data.length > 0">{{ movies.total }} movies found</p>
     <p v-if="movies.data.length === 0">{{ movies.total }} No movies found</p>
-    <div class="grid grid-cols-4" >
+    <div class="grid grid-cols-4">
       <div v-for="movie in movies.data" :key="movie.imdbID" class="p-3">
         <MoviePanel
           :title="movie.Title"
@@ -71,16 +72,11 @@ export default defineComponent({
     const router = useRouter();
     const store = useMovieStore();
     const { loadFavMoviesAsync } = store;
-    const { title, page } = route.query;
 
-    const currentPage = ref<number>(
-      page && parseInt(page.valueOf().toString()) > 1
-        ? parseInt(page.valueOf().toString())
-        : 1
-    );
+    const currentPage = ref<number>(1);
     const pagesIndexes = ref<number[]>([]);
     const movies = ref<MovieListPage>(initialMoviePage);
-    const searchValue = ref(title ? title.valueOf().toString() : "");
+    const searchValue = ref("");
     const initialFavMovieImdbIDs = new Set<string>();
 
     const syncFavMovies = async () => {
@@ -107,6 +103,16 @@ export default defineComponent({
 
     const search = async () => {
       movies.value = await searchMovies(searchValue.value, currentPage.value);
+    };
+
+    const readRoutingValues = () => {
+      const { title, page } = route.query;
+
+      currentPage.value =
+        page && parseInt(page.valueOf().toString()) > 1
+          ? parseInt(page.valueOf().toString())
+          : 1;
+      searchValue.value = title ? title.valueOf().toString() : "";
     };
 
     const loadPage = async () => {
@@ -168,7 +174,16 @@ export default defineComponent({
     );
     watch(() => currentPage.value, updateRouting);
 
+    watch(
+      () => route.query,
+      async () => {
+        readRoutingValues();
+        await loadPage();
+      }
+    );
+
     // Before create
+    readRoutingValues();
     await loadPage();
 
     return {
