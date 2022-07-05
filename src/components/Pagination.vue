@@ -44,13 +44,18 @@ export default defineComponent({
     const pagesIndexes = ref<number[]>([]);
 
     const loadPages = () => {
-      let i = props.currentPage - 5;
-      let count = 0;
+      let i = props.currentPage - props.numberOfDisplayedPages / 2;
+      props.currentPage + props.numberOfDisplayedPages / 2 >= props.lastPage;
+      if (
+        props.currentPage + props.numberOfDisplayedPages / 2 >=
+        props.lastPage
+      )
+        i = props.lastPage - props.numberOfDisplayedPages + 1;
+      else if (i < props.firstPage) i = props.firstPage;
+
+      let count = props.firstPage;
       pagesIndexes.value = [];
-      while (
-        count < (props.numberOfDisplayedPages || 0) &&
-        i <= props.lastPage
-      ) {
+      while (count <= props.numberOfDisplayedPages && i <= props.lastPage) {
         if (i < props.firstPage) {
           i++;
           continue;
@@ -60,14 +65,16 @@ export default defineComponent({
         i++;
       }
     };
-
+    // Methods
     const goToPage = (page: number) => {
       if (page < props.firstPage || page > props.lastPage) return;
       emit("onChange", page);
     };
 
+    // Watch
     watch(() => [props.lastPage, props.currentPage], loadPages);
 
+    // Before create
     loadPages();
 
     return {
