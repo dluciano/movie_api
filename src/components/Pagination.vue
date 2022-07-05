@@ -1,66 +1,79 @@
 <template>
   <div class="flex justify-center items-center w-full">
-    <a v-on:click="goToFirstPage()" class="ml-1">&lt;&lt;</a>
-    <a v-on:click="goToPreviousPage()">&lt;</a>
+    <a @click="goToPage(firstPage)" class="ml-1">&lt;&lt;</a>
+    <a @click="goToPage(currentPage - 1)">&lt;</a>
     <div class="" v-for="index in pagesIndexes" :key="index">
       <a
-        v-on:click="goToPage(index)"
+        @click="goToPage(index)"
         class="ml-1"
         :class="[currentPage === index ? 'underline' : '']"
         >{{ index }}
       </a>
     </div>
-    <a v-on:click="goToNextPage()" class="ml-1">&gt;</a>
-    <a v-on:click="goToLastPage()" class="ml-1">&gt;&gt;</a>
+    <a @click="goToPage(currentPage + 1)" class="ml-1">&gt;</a>
+    <a @click="goToPage(lastPage)" class="ml-1">&gt;&gt;</a>
   </div>
 </template>
 <script lang="ts">
-import { defineComponent } from "vue";
+import { defineComponent, ref, watch } from "vue";
 
 export default defineComponent({
-  name: "layout",
+  name: "Pagination",
   props: {
-    currentPage: Number,
-    totalNumberOfPages: Number,
+    firstPage: {
+      type: Number,
+      required: true,
+    },
+    currentPage: {
+      type: Number,
+      required: true,
+    },
+    lastPage: {
+      type: Number,
+      required: true,
+    },
+    numberOfDisplayedPages: {
+      type: Number,
+      required: true,
+    },
   },
-  setup(props) {
-    const totalNumberOfPages = ref(props.totalNumberOfPages || 0) ;
-    const currentPage = totalNumberOfPages === 0 ? 0 : props.currentPage || 1;
+  emits: {
+    onChange: (page: number) => true,
+  },
+  setup(props, { emit }) {
+    const pagesIndexes = ref<number[]>([]);
 
-    const emit = defineEmits(["onPageChanged"]);
-    const goToFirstPage = async () => {
-      props.currentPage = 1;
-      emit("onPageChanged", currentPage);
+    const loadPages = () => {
+      let i = props.currentPage - 5;
+      let count = 0;
+      pagesIndexes.value = [];
+      while (
+        count < (props.numberOfDisplayedPages || 0) &&
+        i <= props.lastPage
+      ) {
+        if (i < props.firstPage) {
+          i++;
+          continue;
+        }
+        pagesIndexes.value.push(i);
+        count++;
+        i++;
+      }
     };
-    const goToLastPage = async () => {
-      currentPage = totalNumberOfPages;
-      emit("onPageChanged", currentPage);
+
+    const goToPage = (page: number) => {
+      if (page < props.firstPage || page > props.lastPage) return;
+      emit("onChange", page);
     };
-    const goToPreviousPage = async () => {
-      const nextPage = currentPage.value - 1;
-      if (nextPage <= 0 || nextPage > totalNumberOfPages) return;
-      currentPage = nextPage;
-      emit("onPageChanged", currentPage);
-    };
-    const goToNextPage = async () => {
-      const nextPage = currentPage + 1;
-      if (nextPage <= 0 || nextPage > totalNumberOfPages) return;
-      currentPage = nextPage;
-      emit("onPageChanged", currentPage);
-    };
-    const goToPage = async (pageIndex: number) => {
-      if (pageIndex <= 0 || pageIndex > totalNumberOfPages) return;
-      currentPage = pageIndex;
-    };
+
+    watch(() => [props.lastPage, props.currentPage], loadPages);
+
+    loadPages();
+
     return {
       // Data
-      currentPage,
       pagesIndexes,
       // Methods
-      goToFirstPage,
-      goToLastPage,
-      goToPreviousPage,
-      goToNextPage,
       goToPage,
     };
   },

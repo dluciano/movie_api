@@ -29,20 +29,13 @@
         />
       </div>
     </div>
-    <div class="flex justify-center items-center w-full">
-      <a v-on:click="goToFirstPage()" class="ml-1">&lt;&lt;</a>
-      <a v-on:click="goToPreviousPage()">&lt;</a>
-      <div class="" v-for="index in pagesIndexes" :key="index">
-        <a
-          v-on:click="goToPage(index)"
-          class="ml-1"
-          :class="[currentPage === index ? 'underline' : '']"
-          >{{ index }}
-        </a>
-      </div>
-      <a v-on:click="goToNextPage()" class="ml-1">&gt;</a>
-      <a v-on:click="goToLastPage()" class="ml-1">&gt;&gt;</a>
-    </div>
+    <Pagination
+      :currentPage="currentPage"
+      :firstPage="1"
+      :lastPage="movies.total_pages"
+      :numberOfDisplayedPages="10"
+      @onChange="onPageChanged"
+    />
   </div>
 </template>
 
@@ -53,6 +46,7 @@ import { searchMovies } from "../api/MoviesApi";
 import { useRoute, useRouter } from "vue-router";
 import { useMovieStore } from "@/store";
 import MoviePanel from "@/components/MoviePanel.vue";
+import Pagination from "@/components/Pagination.vue";
 
 const initialMoviePage: MovieListPage = {
   data: [],
@@ -66,6 +60,7 @@ export default defineComponent({
   name: "MovieList",
   components: {
     MoviePanel,
+    Pagination,
   },
   async setup() {
     const route = useRoute();
@@ -74,35 +69,18 @@ export default defineComponent({
     const { loadFavMoviesAsync } = store;
 
     const currentPage = ref<number>(1);
-    const pagesIndexes = ref<number[]>([]);
     const movies = ref<MovieListPage>(initialMoviePage);
     const searchValue = ref("");
-    const initialFavMovieImdbIDs = new Set<string>();
+    const moviesSet = new Set<string>();
 
     const syncFavMovies = async () => {
       await loadFavMoviesAsync();
-      initialFavMovieImdbIDs.clear();
-      for (const m of store.favMovies) initialFavMovieImdbIDs.add(m.imdbID);
-    };
-
-    const updatePagination = (itemsPerPage: number = 10) => {
-      pagesIndexes.value = [];
-      const initialPageIndex =
-        currentPage.value + itemsPerPage <= movies.value.total_pages
-          ? currentPage.value
-          : movies.value.total_pages - itemsPerPage;
-      for (
-        let i = initialPageIndex;
-        i <= movies.value.total_pages && i <= currentPage.value + itemsPerPage;
-        i++
-      ) {
-        if (i <= 0 || i > movies.value.total_pages) continue;
-        pagesIndexes.value.push(i);
-      }
+      moviesSet.clear();
+      for (const m of store.favMovies) moviesSet.add(m.imdbID);
     };
 
     const search = async () => {
-      movies.value = await searchMovies(searchValue.value, currentPage.value);
+      movies.value = await searchMovies(searchValue.value, currentPage.value);    
     };
 
     const readRoutingValues = () => {
@@ -113,12 +91,6 @@ export default defineComponent({
           ? parseInt(page.valueOf().toString())
           : 1;
       searchValue.value = title ? title.valueOf().toString() : "";
-    };
-
-    const loadPage = async () => {
-      await search();
-      await syncFavMovies();
-      updatePagination();
     };
 
     const updateRouting = async () => {
@@ -138,46 +110,27 @@ export default defineComponent({
         path: "",
         query,
       });
-      await loadPage();
+    };
+
+    const loadPage = async () => {
+      await search();
+      await syncFavMovies();
     };
 
     // Methods
-    const goToFirstPage = async () => {
-      currentPage.value = 1;
+    const onPageChanged = async (page: number) => {
+      currentPage.value = page;
+      await updateRouting();
+      await search();
+      await syncFavMovies();
     };
-    const goToLastPage = async () => {
-      currentPage.value = movies.value.total_pages;
-    };
-    const goToPreviousPage = async () => {
-      const nextPage = currentPage.value - 1;
-      if (nextPage <= 0 || nextPage > movies.value.total_pages) return;
-      currentPage.value = nextPage;
-    };
-    const goToNextPage = async () => {
-      const nextPage = currentPage.value + 1;
-      if (nextPage <= 0 || nextPage > movies.value.total_pages) return;
-      currentPage.value = nextPage;
-    };
-    const goToPage = async (pageIndex: number) => {
-      if (pageIndex <= 0 || pageIndex > movies.value.total_pages) return;
-      currentPage.value = pageIndex;
-    };
-    const isFav = (imdbID: string) => initialFavMovieImdbIDs.has(imdbID);
+
+    const isFav = (imdbID: string) => moviesSet.has(imdbID);
 
     // Watch
     watch(
-      () => searchValue.value,
-      async () => {
-        currentPage.value = 1;
-        await updateRouting();
-      }
-    );
-    watch(() => currentPage.value, updateRouting);
-
-    watch(
       () => route.query,
       async () => {
-        readRoutingValues();
         await loadPage();
       }
     );
@@ -189,15 +142,10 @@ export default defineComponent({
     return {
       // Data
       currentPage,
-      pagesIndexes,
       movies,
       searchValue,
       // Methods
-      goToFirstPage,
-      goToLastPage,
-      goToPreviousPage,
-      goToNextPage,
-      goToPage,
+      onPageChanged,
       search,
       isFav,
     };
