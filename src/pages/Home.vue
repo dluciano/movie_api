@@ -4,6 +4,7 @@
       type="search"
       v-model="searchValue"
       placeholder="Type the name of a movie to start searching..."
+      @keyup="onSearch"
       class="
         from-gray-700
         mb-3
@@ -47,6 +48,7 @@ import { useRoute, useRouter } from "vue-router";
 import { useMovieStore } from "@/store";
 import MoviePanel from "@/components/MoviePanel.vue";
 import Pagination from "@/components/Pagination.vue";
+import {debounce} from "lodash";
 
 const initialMoviePage: MovieListPage = {
   data: [],
@@ -80,7 +82,7 @@ export default defineComponent({
     };
 
     const search = async () => {
-      movies.value = await searchMovies(searchValue.value, currentPage.value);    
+      movies.value = await searchMovies(searchValue.value, currentPage.value);
     };
 
     const readRoutingValues = () => {
@@ -127,10 +129,17 @@ export default defineComponent({
 
     const isFav = (imdbID: string) => moviesSet.has(imdbID);
 
+    const onSearch = debounce(async () => {
+      currentPage.value = 1;
+      await updateRouting();
+      loadPage();
+    }, 500);
+
     // Watch
     watch(
       () => route.query,
       async () => {
+        readRoutingValues();
         await loadPage();
       }
     );
@@ -146,8 +155,8 @@ export default defineComponent({
       searchValue,
       // Methods
       onPageChanged,
-      search,
       isFav,
+      onSearch,
     };
   },
 });
