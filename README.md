@@ -13,7 +13,7 @@ Simple site to search IMDB movies and save it as favorite in your browser.
  - Jest and MWS
 
  ## TODO's
- - [ ] The movies grid found in the Home page could be a shared component and used in the favorites page
+ - [x] The movies grid found in the Home page ~could be a shared component and used in the favorites page~
  - [ ] Unit test the store and the repo
  - [ ] UI Test
  - [ ] E2E Test
