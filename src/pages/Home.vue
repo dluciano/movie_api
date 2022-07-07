@@ -20,16 +20,15 @@
     />
     <p v-if="movies.data.length > 0">{{ movies.total }} movies found</p>
     <p v-if="movies.data.length === 0">{{ movies.total }} No movies found</p>
-    <div class="grid grid-cols-4">
-      <div v-for="movie in movies.data" :key="movie.imdbID" class="p-3">
-        <MoviePanel
-          :title="movie.Title"
-          :imdbID="movie.imdbID"
-          :year="movie.Year"
-          :isChecked="isFav(movie.imdbID)"
-        />
-      </div>
-    </div>
+    <n-space vertical >
+      <MoviePanel
+        :title="movie.Title"
+        :imdbID="movie.imdbID"
+        :year="movie.Year"
+        :isChecked="isFav(movie.imdbID)"
+        v-for="movie in movies.data" :key="movie.imdbID"
+      />
+    </n-space>
     <n-pagination
       v-model:page="currentPage"
       v-model:page-count="movies.total_pages"
@@ -46,7 +45,7 @@ import { useMovieStore } from "@/store";
 import MoviePanel from "@/components/MoviePanel.vue";
 import Pagination from "@/components/Pagination.vue";
 import { debounce } from "lodash";
-import { NPagination } from "naive-ui";
+import { NPagination, NSpace } from "naive-ui";
 
 const initialMoviePage: MovieListPage = {
   data: [],
@@ -62,6 +61,7 @@ export default defineComponent({
     MoviePanel,
     Pagination,
     NPagination,
+    NSpace,
   },
   async setup() {
     const route = useRoute();
