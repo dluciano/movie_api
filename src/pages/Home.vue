@@ -20,13 +20,14 @@
     />
     <p v-if="movies.data.length > 0">{{ movies.total }} movies found</p>
     <p v-if="movies.data.length === 0">{{ movies.total }} No movies found</p>
-    <n-space vertical >
+    <n-space vertical class="mb-3">
       <MoviePanel
         :title="movie.Title"
         :imdbID="movie.imdbID"
         :year="movie.Year"
         :isChecked="isFav(movie.imdbID)"
-        v-for="movie in movies.data" :key="movie.imdbID"
+        v-for="movie in movies.data"
+        :key="movie.imdbID"
       />
     </n-space>
     <n-pagination

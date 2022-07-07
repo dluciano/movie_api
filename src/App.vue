@@ -20,7 +20,9 @@
               Favorites
             </p></router-link
           >
-          <h1 class="font-bold text-2xl mb-0">IMDB Movies Searcher</h1>
+          <h1 class="font-bold text-2xl mb-0" style="margin-top: 24px">
+            IMDB Movies Searcher
+          </h1>
           <p class="font-light">
             List of movies registered in IMDB. Search your loved movies and then
             add it as favorite
@@ -42,7 +44,9 @@
             </suspense>
           </router-view>
         </n-layout-content>
-        <n-layout-footer>Dawlin&copy; 2022</n-layout-footer>
+        <n-layout-footer style="padding: 24px">
+          <n-text> Dawlin&copy; 2022 </n-text>
+        </n-layout-footer>
       </n-layout>
     </n-space>
   </n-config-provider>
@@ -59,6 +63,7 @@ import {
   NLayoutHeader,
   NLayoutContent,
   NLayoutFooter,
+  NText,
 } from "naive-ui";
 
 export default defineComponent({
@@ -69,6 +74,7 @@ export default defineComponent({
     NLayoutHeader,
     NLayoutContent,
     NLayoutFooter,
+    NText,
   },
   setup() {
     const store = useMovieStore();
