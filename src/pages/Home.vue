@@ -30,12 +30,9 @@
         />
       </div>
     </div>
-    <Pagination
-      :currentPage="currentPage"
-      :firstPage="1"
-      :lastPage="movies.total_pages"
-      :numberOfDisplayedPages="10"
-      @onChange="onPageChanged"
+    <n-pagination
+      v-model:page="currentPage"
+      v-model:page-count="movies.total_pages"
     />
   </div>
 </template>
@@ -48,7 +45,8 @@ import { useRoute, useRouter } from "vue-router";
 import { useMovieStore } from "@/store";
 import MoviePanel from "@/components/MoviePanel.vue";
 import Pagination from "@/components/Pagination.vue";
-import {debounce} from "lodash";
+import { debounce } from "lodash";
+import { NPagination } from "naive-ui";
 
 const initialMoviePage: MovieListPage = {
   data: [],
@@ -63,6 +61,7 @@ export default defineComponent({
   components: {
     MoviePanel,
     Pagination,
+    NPagination,
   },
   async setup() {
     const route = useRoute();
@@ -120,12 +119,14 @@ export default defineComponent({
     };
 
     // Methods
-    const onPageChanged = async (page: number) => {
-      currentPage.value = page;
-      await updateRouting();
-      await search();
-      await syncFavMovies();
-    };
+    watch(
+      () => currentPage.value,
+      async () => {
+        await updateRouting();
+        await search();
+        await syncFavMovies();
+      }
+    );
 
     const isFav = (imdbID: string) => moviesSet.has(imdbID);
 
@@ -154,7 +155,6 @@ export default defineComponent({
       movies,
       searchValue,
       // Methods
-      onPageChanged,
       isFav,
       onSearch,
     };
