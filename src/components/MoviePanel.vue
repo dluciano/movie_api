@@ -1,74 +1,65 @@
 <template>
-  <div
-    class="
-      inline-block
-      p-3
-      w-full
-      h-full
-      bg-white
-      rounded-lg
-      border border-gray-200
-      shadow-md
-      hover:bg-gray-100
-      dark:bg-gray-800 dark:border-gray-700 dark:hover:bg-gray-700
-    "
-  >
-    <article>
-      <h1 class="font-black inline-block w-64">{{ title }}</h1>
-      <p class="inline-block float-right">#{{ imdbID }}</p>
-      <p>{{ year }}</p>
-    </article>
-    <div class="float-right">
-      <input
-        type="checkbox"
-        @change="(e) => onFavMovieChanged(e, { title, year, imdbID })"
-        :checked="isChecked"
-      />
-      Add to favorites
-    </div>
-  </div>
+  <n-card :title="title" size="small">
+    <n-text depth="3">#{{ imdbID }}</n-text>
+    <n-h6>{{ year }}</n-h6>
+    <n-switch
+      :value="isFavorite"
+      @update-value="() => onFavMovieChanged({ title, year, imdbID })"
+    />
+    Add to favorites
+  </n-card>
 </template>
 
 <script lang="ts">
 import type { Movie } from "@/api";
 import { useMovieStore } from "@/store";
-import { defineComponent } from "vue";
+import { defineComponent, ref } from "vue";
+import { NCard, NH6, NText, NSwitch } from "naive-ui";
 
 export default defineComponent({
   name: "MoviePanel",
+  components: {
+    NCard,
+    NH6,
+    NText,
+    NSwitch,
+  },
   props: {
     title: String,
     year: Number,
     imdbID: String,
     isChecked: Boolean,
   },
-  setup() {
+  setup(props) {
     const { addFavMovieAsync, removeFavMovieAsync } = useMovieStore();
-
-    const onFavMovieChanged = (
-      e: Event,
-      {
-        title,
-        year,
-        imdbID,
-      }: { title?: string; year?: number; imdbID?: string }
-    ) => {
-      if (!title || !year || !imdbID) return;
-      const { checked } = e.target as HTMLInputElement;
+    const isFavorite = ref(props.isChecked);
+    const onFavMovieChanged = async ({
+      title,
+      year,
+      imdbID,
+    }: {
+      title?: string;
+      year?: number;
+      imdbID?: string;
+    }) => {
+      isFavorite.value = !isFavorite.value;
+      if (!title || !year || !imdbID) throw new Error("invalid values in card");
       const movie: Movie = {
         Title: title,
         Year: year,
         imdbID: imdbID,
       };
-      if (checked) {
-        addFavMovieAsync(movie);
+
+      if (isFavorite.value) {
+        await addFavMovieAsync(movie);
         return;
       }
-      removeFavMovieAsync(movie.imdbID);
+      await removeFavMovieAsync(movie.imdbID);
     };
 
     return {
       onFavMovieChanged,
+      isFavorite,
     };
   },
 });
